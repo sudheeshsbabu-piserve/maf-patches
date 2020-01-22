@@ -1,0 +1,19 @@
+diff --git a/src/Form/ImporterForm.php b/src/Form/ImporterForm.php
+index bcb3c88..143f115 100644
+--- a/src/Form/ImporterForm.php
++++ b/src/Form/ImporterForm.php
+@@ -346,7 +346,13 @@ class ImporterForm extends FormBase {
+       $entity_type_bundle = $form_state->getUserInput()['entity_type_bundle'];
+     }
+ 
+-    $entity_fields = $this->getEntityTypeFields($entity_type, $entity_type_bundle);
++    if($entity_type == "taxonomy_term" && !empty($entity_type_bundle))
++    {
++      $service = \Drupal::service('enterprise_management.entity_creation');
++      $csv_parse = $service->getUniqueTaxonomyTermsOnCSVUpload($entity_type_bundle, $csv_parse);
++    }
++
++    $entity_fields = $this->getEntityTypeFields($entity_type, $entity_type_bundle); 
+ 
+     if ($required = $this->getEntityTypeMissingFields($entity_type, $entity_fields['required'], $csv_parse)) {
+       $render = [
