@@ -1,0 +1,63 @@
+diff --git a/docroot/modules/custom/enterprise_management/enterprise_management.module b/docroot/modules/custom/enterprise_management/enterprise_management.module
+index 9c495ba5..4638183b 100644
+--- a/docroot/modules/custom/enterprise_management/enterprise_management.module
++++ b/docroot/modules/custom/enterprise_management/enterprise_management.module
+@@ -141,3 +141,11 @@ function enterprise_management_modules_uninstalled($modules) {
+     }
+   }
+ }
++
++
++
++function enterprise_management_preprocess_form(&$vars) {
++  // kint($vars);
++  // die;
++  
++}
+\ No newline at end of file
+diff --git a/docroot/modules/custom/enterprise_management/enterprise_management.routing.yml b/docroot/modules/custom/enterprise_management/enterprise_management.routing.yml
+index 92603ed6..b607bc93 100644
+--- a/docroot/modules/custom/enterprise_management/enterprise_management.routing.yml
++++ b/docroot/modules/custom/enterprise_management/enterprise_management.routing.yml
+@@ -3,5 +3,13 @@ enterprise_management.create_structure_term_vocabularies:
+   defaults:
+     _controller: '\Drupal\enterprise_management\Controller\EnterpriseController::createStructureTermVocabularies'
+     _title: 'Enterprise Management - Create Structure Term Vocabularies'
++  requirements:
++    _permission: 'access content'
++
++enterprise_management.initial_setup:
++  path: '/enterprise-management/initial-setup'
++  defaults:
++    _controller:  '\Drupal\enterprise_management\Controller\EnterpriseController::initialSetup'
++    _title: 'Initial Setup'
+   requirements:
+     _permission: 'access content'
+\ No newline at end of file
+diff --git a/docroot/modules/custom/enterprise_management/src/Controller/EnterpriseController.php b/docroot/modules/custom/enterprise_management/src/Controller/EnterpriseController.php
+index ee871a85..bfbb091a 100644
+--- a/docroot/modules/custom/enterprise_management/src/Controller/EnterpriseController.php
++++ b/docroot/modules/custom/enterprise_management/src/Controller/EnterpriseController.php
+@@ -36,4 +36,21 @@ public function createStructureTermVocabularies() {
+     ];
+   }
+ 
++  public function initialSetup() {
++    //$node = \Drupal\node\Entity\Node::create(['type' => 'article']);
++    $term = \Drupal\taxonomy\Entity\Term::create(['vid' => 'structure']);
++    $form = \Drupal::service('entity.form_builder')->getForm($term);
++    $form['actions']['next'] = [
++      '#type' => 'submit',
++      '#button_type' => 'primary',
++      '#value' => $this->t('Next'),
++      // Custom submission handler for page 1.
++      '#submit' => ['::fapiExampleMultistepFormNextSubmit'],
++      // Custom validation handler for page 1.
++      '#validate' => ['::fapiExampleMultistepFormNextValidate'],
++    ];
++    //kint($form);die;
++    return $form;
++  }
++
+ }
+\ No newline at end of file
